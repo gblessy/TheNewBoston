@@ -12,30 +12,36 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-public class GFXSurface extends Activity implements OnTouchListener{
+public class GFXSurface extends Activity implements OnTouchListener {
 
 	MyBringBackSurface ourSurfaceView;
-	float x, y;
-	
-	
+	float x, y, sX, sY, fX, fY;
+	Bitmap test, plus;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		ourSurfaceView = new MyBringBackSurface(this);
 		ourSurfaceView.setOnTouchListener(this);
-		x=0;
-		y=0;
+		x = 0;
+		y = 0;
+		sX = 0;
+		sY = 0;
+		fX = 0;
+		fY = 0;
+		test = BitmapFactory.decodeResource(getResources(), R.drawable.greenball);
+		plus = BitmapFactory.decodeResource(getResources(), R.drawable.plus);
 		setContentView(ourSurfaceView);
 	}
-	
+
 	@Override
 	protected void onPause() {
 		// TODO Auto-generated method stub
 		super.onPause();
 		ourSurfaceView.pause();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
@@ -48,25 +54,36 @@ public class GFXSurface extends Activity implements OnTouchListener{
 		// TODO Auto-generated method stub
 		x = event.getX();
 		y = event.getY();
+
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			sX = event.getX();
+			sY = event.getY();
+			break;
+		case MotionEvent.ACTION_UP:
+			fX = event.getX();
+			fY = event.getY();
+			break;
+		}
 		return true;
 	}
-	public class MyBringBackSurface extends SurfaceView implements Runnable{
+
+	public class MyBringBackSurface extends SurfaceView implements Runnable {
 
 		SurfaceHolder ourHolder;
 		Thread ourThread = null;
 		boolean isRunning = false;
-		
-		
+
 		public MyBringBackSurface(Context context) {
 			// TODO Auto-generated constructor stub
 			super(context);
 			ourHolder = getHolder();
-			
+
 		}
-		
-		public void pause(){
+
+		public void pause() {
 			isRunning = false;
-			while (true){
+			while (true) {
 				try {
 					ourThread.join();
 				} catch (InterruptedException e) {
@@ -75,39 +92,42 @@ public class GFXSurface extends Activity implements OnTouchListener{
 				}
 				break;
 			}
-			ourThread=null;
+			ourThread = null;
 		}
 
-		public void resume(){
+		public void resume() {
 			isRunning = true;
 			ourThread = new Thread(this);
 			ourThread.start();
 		}
-		
-		
+
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			while (isRunning){
+			while (isRunning) {
 				if (!ourHolder.getSurface().isValid())
 					continue;
-				
+
 				Canvas canvas = ourHolder.lockCanvas();
 				canvas.drawRGB(2, 2, 150);
-				if (x != 0 && y != 0){
-					Bitmap test = BitmapFactory.decodeResource(getResources(), R.drawable.greenball);
-					canvas.drawBitmap(test, x-(test.getWidth()/2), y-(test.getHeight()/2), null);
+				if (x != 0 && y != 0) {
+
+					canvas.drawBitmap(test, x - (test.getWidth() / 2), y - (test.getHeight() / 2), null);
+				}
+				if (sX != 0 && sY != 0) {
+
+					canvas.drawBitmap(plus, sX - (plus.getWidth() / 2), sY - (plus.getHeight() / 2), null);
+				}
+				if (fX != 0 && fY != 0) {
+
+					canvas.drawBitmap(plus, fX - (plus.getWidth() / 2), fY - (plus.getHeight() / 2), null);
 				}
 				ourHolder.unlockCanvasAndPost(canvas);
-				
+
 			}
-			
-			
+
 		}
 
 	}
 
 }
-
-
- 
